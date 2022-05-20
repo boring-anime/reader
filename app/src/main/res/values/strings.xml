@@ -1,4 +1,3 @@
 <resources>
-    <string name="app_name">NfcReader</string>
-    <string name="description">Read and Write NDEF Tag</string>
+    <string name="app_name">NFCReaderWriter</string>
 </resources>
