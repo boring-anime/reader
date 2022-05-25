@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">NfcReader</string>
+    <string name="app_name">reader isodep</string>
     <string name="description">Read and Write NDEF Tag</string>
 </resources>
