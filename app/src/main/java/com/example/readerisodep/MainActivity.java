@@ -1,25 +1,17 @@
 package com.example.readerisodep;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.nfc.tech.IsoDep;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import com.example.readerisodep.Utils;
 
 public class MainActivity extends AppCompatActivity {
     public static final String Error_Detected = "No NFC Tag Detected";
@@ -41,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }else{
             Toast.makeText(this, "Nfc found", Toast.LENGTH_LONG).show();
-            Log.i("On create", "Nfc found");
+            Log.d("On create", "Nfc found");
             try {
                 readFromIntent(getIntent());
             } catch (IOException e) {
@@ -54,9 +46,11 @@ public class MainActivity extends AppCompatActivity {
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
                 || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
                 ){
-            Log.i("From Intent", "Tag discovered");
+            Log.d("From Intent", "Tag discovered");
+            Toast.makeText(this, "tag is discovered", Toast.LENGTH_LONG).show();
             Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             IsoDep tag = IsoDep.get(tagFromIntent);
+            Toast.makeText(this, "Discovered tag is "+ tag, Toast.LENGTH_LONG).show();
             tag.connect();
             if(tag.isConnected()){
                 Toast.makeText(this, "tag is connected", Toast.LENGTH_LONG).show();
@@ -64,24 +58,27 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Max length: " + maxLength, Toast.LENGTH_LONG).show();
                 Log.d("Length", Integer.toString(maxLength));
             }
-            byte[] SELECT = new byte[] { (byte)0xF0, (byte)0x01, (byte)0x02, (byte)0x03, (byte)0x04, (byte)0x05, (byte)0x06 };
-            byte[] readrecord_apdu = new byte[] { (byte) 0x94, (byte)0xB2, 0x01, 0x04, 0x00 };
-            byte[] result =  new byte[0];
-            byte[] result1 =  new byte[0];
-            result1 = tag.transceive(SELECT);
-            result = tag.transceive(readrecord_apdu);
-            Log.d("Length", Integer.toString(result.length));
+
+            byte[] SELECT = {
+                    (byte) 0x00, // CLA Class
+                    (byte) 0xA4, // INS Instruction
+                    (byte) 0x04, // P1  Parameter 1
+                    (byte) 0x00, // P2  Parameter 2
+                    (byte) 0x07, // Length
+                    (byte) 0xF0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06
+            };
+
+            byte[] response =  new byte[50];
+            response = tag.transceive(SELECT);
+            Log.d("Length", Integer.toString(response.length));
+
+            Toast.makeText(this, "Result from select is "+ Utils.toHexString(response), Toast.LENGTH_LONG).show();
+
             ArrayList <Byte> b_result = new ArrayList<>();
+            for (int i = 0; i < response.length; i++) {
+                Log.d("result","data at index " + i + " = " + String.valueOf(response[i]));
+            }
 
-           /* for (int i = 0; i < result.length; i++) {
-                Log.d("result","data at index " + i + " = " + String.valueOf(result[i]));
-
-            }*/
-            Log.d("result","data at index "  + " = " + Utils.toHexString(result));
-            Log.d("result1","data at index "  + " = " + Utils.toHexString(result1));
-
-            Log.d("Length 0", Byte.toString(result[0]));
-            Log.d("Length 1", Byte.toString(result[1]));
             /*byte[] msgs = null;
             if (rawMsgs != null) {
                 msgs = new NdefMessage[rawMsgs.length];
