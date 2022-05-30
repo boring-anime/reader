@@ -74,6 +74,10 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Result from select is "+ Utils.toHexString(response), Toast.LENGTH_LONG).show();
 
+            String string = new String(response);
+            Toast.makeText(this, "Response String is "+ string, Toast.LENGTH_LONG).show();
+            //System.out.println(string);
+
             ArrayList <Byte> b_result = new ArrayList<>();
             for (int i = 0; i < response.length; i++) {
                 Log.d("result","data at index " + i + " = " + String.valueOf(response[i]));
